@@ -77,9 +77,8 @@ def mostrar_menu_principal():
                 titulo = input("Título de la noticia: ")
                 contenido = input("Contenido: ")
                 
-                # Obtener id de periodista
-                id_p = usuario_actual.id
-                exito, msg = crear_noticia(titulo, contenido, id_p)
+                # Pasamos el objeto usuario_actual completo al servicio
+                exito, msg = crear_noticia(titulo, contenido, usuario_actual)
                 print(f"\n{msg}")
             elif opcion == "0":
                 usuario_actual = None
