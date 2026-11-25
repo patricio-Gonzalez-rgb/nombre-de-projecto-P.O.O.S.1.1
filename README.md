@@ -44,23 +44,6 @@ Eliminar es lógico: las noticias pasan a "Archivado" y los usuarios quedan desh
 python -m pip install -r requirements.txt
 ```
 
-## Preparación de MySQL
-
-Ejecuta en MySQL Workbench o phpMyAdmin, en este orden, los scripts de `datos/sql/`:
-
-1. `2026.11.24_10.00_DDL_Noticias.sql`
-2. `2026.11.24_10.10_CREATE_USER.sql` (cambia `CAMBIA_ESTA_CLAVE` por tu clave antes de ejecutarlo)
-3. `2026.11.24_10.20_Insert_usuarios.sql`
-
-El archivo `2026.11.24_10.05_Alter_noticias.sql` es solo para quien ya tenga la base
-creada con una versión anterior (agrega la columna `habilitado` y el estado "Archivado").
-Si ejecutas el DDL actual, no es necesario.
-
-La aplicación no debe usar la cuenta `root`.
-
-## Configuración
-
-Crea un archivo `.env` en la raíz del proyecto (está excluido de git, no lo publiques):
 
 ```dotenv
 db=noticias
@@ -76,7 +59,7 @@ password=<tu_clave_mysql>
 python app.py
 ```
 
-Usuarios de demostración (del script de inserts):
+Usuarios de demostración (script de inserts):
 
 | Rol | Correo | Contraseña |
 | --- | --- | --- |

@@ -1,23 +1,14 @@
-from peewee import MySQLDatabase, OperationalError
+from decouple import config
+from peewee import MySQLDatabase
 
-# Configuración de conexión con tu usuario patricio y contraseña 1234
-database = MySQLDatabase(
-    'noticias',
-    user='patricio',
-    password='1234',
-    host='localhost',
-    port=3306,
-    charset='utf8mb4'
-)
 
-def probar_conexion():
-    """Realiza una prueba explícita de conexión a la base de datos."""
-    try:
-        database.connect()
-        print("Conexión exitosa a la base de datos 'noticias' con el usuario patricio.")
-        database.close()
-    except OperationalError as e:
-        print(f"Error al conectar a la base de datos: {e}")
+def conectar():
+    return MySQLDatabase(config('db'), **{
+        'charset': 'utf8mb4',
+        'host': config('host'),
+        'port': config('port', cast=int),
+        'user': config('user'),
+        'password': config('password')})
 
-if __name__ == '__main__':
-    probar_conexion()
+
+database = conectar()
