@@ -1,0 +1,2 @@
+from datos.repositorio.repositorio_usuario import RepositorioUsuario
+from datos.repositorio.repositorio_noticia import RepositorioNoticia

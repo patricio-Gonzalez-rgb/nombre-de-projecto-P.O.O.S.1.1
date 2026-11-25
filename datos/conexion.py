@@ -1,6 +1,6 @@
 from peewee import MySQLDatabase, OperationalError
 
-# Configuración de conexión con tu usuario 'patricio' y contraseña '1234'
+# Configuración de conexión con tu usuario patricio y contraseña 1234
 database = MySQLDatabase(
     'noticias',
     user='patricio',

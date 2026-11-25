@@ -1,48 +1,91 @@
-# nombre-de-projecto-P.O.O.S.1.1
-Plataforma de Noticias
-
 # Sistema de Gestión de Noticias - INACAP
 
-Aplicación desarrollada en Python aplicando el paradigma de Programación Orientada a Objetos (POO) y Arquitectura por Capas, utilizando el ORM Peewee para la interacción y persistencia con la base de datos MySQL.
+Aplicación de consola en Python con Programación Orientada a Objetos y arquitectura por capas.
+Usa el ORM Peewee para persistir en MySQL.
 
----
+## Estructura del proyecto
 
-## Arquitectura del Proyecto
+```text
+.
+├── app.py                  # Punto de entrada
+├── auxiliares/             # Textos, menús, roles, estados y validaciones
+├── presentacion/           # Menús e interacción por consola
+├── negocio/                # Reglas de negocio y permisos por rol
+└── datos/
+    ├── conexion.py         # Conexión MySQL (lee el archivo .env)
+    ├── models.py           # Modelos de Peewee
+    ├── repositorio/        # Consultas y operaciones de persistencia
+    └── sql/                # Creación y carga de datos
+```
 
-El sistema aplica el principio de Separación de Responsabilidades estructurándose en 3 capas principales:
+1. **Presentación:** recibe opciones y datos del usuario y muestra resultados.
+2. **Negocio:** valida permisos y coordina las operaciones.
+3. **Datos:** modelos, repositorios y conexión con MySQL.
 
-1. Capa de Presentación (presentacion/)
-   - Maneja la interacción directa con el usuario a través de la consola.
-   - menu.py: Muestra las opciones del sistema, recibe las entradas de teclado y presenta las respuestas sin ejecutar lógica de negocio ni consultas directas a la base de datos.
+## Roles
 
-2. Capa de Negocio (negocio/)
-   - Contiene la lógica central del sistema y las reglas de negocio.
-   - servicio.py: Valida permisos, procesa inicios de sesión y coordinaciones entre entidades. Se comunica con la capa de datos exclusivamente a través de la capa de repositorios.
+| Rol | Puede |
+| --- | --- |
+| Lector | Ver y leer noticias publicadas |
+| Periodista | Lo anterior + crear sus noticias (quedan en Borrador), modificarlas y eliminarlas |
+| Editor | Lo anterior + publicar, modificar o eliminar cualquier noticia y gestionar usuarios |
 
-3. Capa de Datos (datos/)
-   - conexion.py: Configura la conexión local hacia el motor MySQL.
-   - models.py: Define los modelos ORM de Peewee (Usuario, Periodista, Editor, Lector, Noticia, etc.).
-   - repositorio/: Contiene clases desacopladas (repositorio_usuario.py, repositorio_noticia.py) que encapsulan todas las consultas SQL/ORM a la base de datos.
-   - sql/: Scripts de migración, inserción de parámetros y scripts DDL.
+El registro público permite crear Lectores y Periodistas. Los Editores se crean por SQL.
+Eliminar es lógico: las noticias pasan a "Archivado" y los usuarios quedan deshabilitados.
 
----
+## Requisitos
 
-## Conceptos de POO Aplicados
+- Python 3.10 o superior
+- MySQL Server en ejecución
 
-- Encapsulamiento y Módulos: Cada capa oculta sus detalles internos. La presentación desconoce cómo se guardan los datos, y el servicio no maneja entradas directas por teclado.
-- Herencia: Los modelos ORM extienden de BaseModel (de Peewee) para compartir configuraciones de conexión y metadatos comunes.
-- Abstracción: Los métodos estáticos dentro de la capa repositorio/ abstraen las consultas complejas de base de datos exponiendo solo funciones claras (buscar_por_email, crear_noticia).
-- Desacoplamiento (Patrón Repositorio): Separa la lógica de acceso a datos de las reglas de negocio, permitiendo un código mantenible y escalable.
+## Instalación
 
----
+```powershell
+python -m pip install -r requirements.txt
+```
 
-## Instrucciones de Ejecución
+## Preparación de MySQL
 
-### 1. Requisitos Previos
-- Python 3.10+
-- Servidor MySQL activo (WampServer / XAMPP)
+Ejecuta en MySQL Workbench o phpMyAdmin, en este orden, los scripts de `datos/sql/`:
 
-### 2. Instalación de Dependencias
-Ejecuta en la terminal del proyecto:
-```bash
-pip install peewee pymysql
+1. `2026.11.24_10.00_DDL_Noticias.sql`
+2. `2026.11.24_10.10_CREATE_USER.sql` (cambia `CAMBIA_ESTA_CLAVE` por tu clave antes de ejecutarlo)
+3. `2026.11.24_10.20_Insert_usuarios.sql`
+
+El archivo `2026.11.24_10.05_Alter_noticias.sql` es solo para quien ya tenga la base
+creada con una versión anterior (agrega la columna `habilitado` y el estado "Archivado").
+Si ejecutas el DDL actual, no es necesario.
+
+La aplicación no debe usar la cuenta `root`.
+
+## Configuración
+
+Crea un archivo `.env` en la raíz del proyecto (está excluido de git, no lo publiques):
+
+```dotenv
+db=noticias
+host=localhost
+port=3306
+user=noticias_app
+password=<tu_clave_mysql>
+```
+
+## Ejecución
+
+```powershell
+python app.py
+```
+
+Usuarios de demostración (del script de inserts):
+
+| Rol | Correo | Contraseña |
+| --- | --- | --- |
+| Editor | editor@noticias.cl | Editor#2026 |
+| Periodista | periodista@noticias.cl | Periodista#2026 |
+| Lector | lector@noticias.cl | Lector#2026 |
+
+## Convenciones
+
+- Cada función o clase va en el módulo de su responsabilidad.
+- Sin consultas a la base de datos en la capa de presentación.
+- Sin contraseñas ni credenciales en el código.

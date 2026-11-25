@@ -1,86 +1,117 @@
-from negocio.servicio import iniciar_sesion, registrar_usuario, listar_noticias_publicadas, crear_noticia
+from auxiliares import (
+    nombre_app, version_app, mensaje_error_opcion,
+    menu_principal, diccionario_menu_principal,
+    menu_sesion, diccionario_menu_sesion,
+    menu_noticias, diccionario_menu_noticias,
+    menu_usuarios, diccionario_menu_usuarios)
+from negocio import puede_gestionar_noticias, puede_gestionar_usuarios
+from presentacion.presentacion_usuario import (
+    iniciar_sesion_usuario, registrar_nuevo_usuario,
+    mostrar_listado_usuarios, modificar_usuario, eliminar_usuario)
+from presentacion.presentacion_noticia import (
+    mostrar_noticias_publicadas, mostrar_listado_noticias,
+    crear_noticia, modificar_noticia, publicar_noticia, eliminar_noticia)
 
-def mostrar_menu_principal():
-    usuario_actual = None
-    rol_actual = None
+
+def mostrar_menu(titulo, opciones):
+    print(titulo)
+    print(f'{"=" * len(titulo)}\n')
+
+    for clave, valor in opciones.items():
+        print(f'[{clave}] - {valor}')
+
+
+def cargar_menu_noticias(usuario, rol):
+    while True:
+        mostrar_menu(menu_noticias, diccionario_menu_noticias)
+        opcion = input('Seleccione su opción: ')
+        print()
+
+        match opcion:
+            case '1':
+                mostrar_listado_noticias()
+            case '2':
+                crear_noticia(usuario, rol)
+            case '3':
+                modificar_noticia(usuario, rol)
+            case '4':
+                publicar_noticia(usuario, rol)
+            case '5':
+                eliminar_noticia(usuario, rol)
+            case '0':
+                print('Volviendo a Menú Sesión...\n')
+                break
+            case _:
+                print(mensaje_error_opcion)
+
+
+def cargar_menu_usuarios(usuario, rol):
+    while True:
+        mostrar_menu(menu_usuarios, diccionario_menu_usuarios)
+        opcion = input('Seleccione su opción: ')
+        print()
+
+        match opcion:
+            case '1':
+                mostrar_listado_usuarios()
+            case '2':
+                modificar_usuario(usuario, rol)
+            case '3':
+                eliminar_usuario(usuario, rol)
+            case '0':
+                print('Volviendo a Menú Sesión...\n')
+                break
+            case _:
+                print(mensaje_error_opcion)
+
+
+def cargar_menu_sesion(usuario, rol):
+    while True:
+        print(f'Sesión activa: {usuario.nombre} ({rol})\n')
+        mostrar_menu(menu_sesion, diccionario_menu_sesion)
+        opcion = input('Seleccione su opción: ')
+        print()
+
+        match opcion:
+            case '1':
+                mostrar_noticias_publicadas()
+            case '2':
+                if puede_gestionar_noticias(rol):
+                    cargar_menu_noticias(usuario, rol)
+                else:
+                    print('Solo Periodistas y Editores gestionan noticias.\n')
+            case '3':
+                if puede_gestionar_usuarios(rol):
+                    cargar_menu_usuarios(usuario, rol)
+                else:
+                    print('Solo un Editor gestiona usuarios.\n')
+            case '0':
+                print('Sesión cerrada con éxito.\n')
+                break
+            case _:
+                print(mensaje_error_opcion)
+
+
+def cargar_menu():
+    print(f'\n{nombre_app} - {version_app}')
+    print(f'{"=" * (len(nombre_app) + len(version_app) + 3)}\n')
 
     while True:
-        print("\n" + "="*40)
-        print("    SISTEMA DE NOTICIAS - INACAP    ")
-        print("="*40)
-        
-        if usuario_actual:
-            print(f"Sesión activa: {usuario_actual.nombre} ({rol_actual})")
-            print("-" * 40)
-            print("1. Ver noticias publicadas")
-            if rol_actual in ["Periodista", "Editor"]:
-                print("2. Crear nueva noticia")
-            print("0. Cerrar sesión")
-        else:
-            print("1. Iniciar sesión")
-            print("2. Registrarse")
-            print("3. Ver noticias publicadas (invitado)")
-            print("0. Salir")
+        mostrar_menu(menu_principal, diccionario_menu_principal)
+        opcion = input('Seleccione su opción: ')
+        print()
 
-        opcion = input("\nSeleccione una opción: ").strip()
-
-        if not usuario_actual:
-            if opcion == "1":
-                email = input("Correo: ")
-                password = input("Contraseña: ")
-                exito, res, rol = iniciar_sesion(email, password)
-                if exito:
-                    usuario_actual = res
-                    rol_actual = rol
-                    print(f"\n¡Bienvenido/a {usuario_actual.nombre}!")
-                else:
-                    print(f"\nError: {res}")
-            elif opcion == "2":
-                nombre = input("Nombre completo: ")
-                email = input("Correo electrónico: ")
-                password = input("Contraseña: ")
-                print("Roles: 1. Lector | 2. Periodista | 3. Editor")
-                rol_opc = input("Seleccione rol (1-3): ").strip()
-                roles = {"1": "Lector", "2": "Periodista", "3": "Editor"}
-                rol = roles.get(rol_opc, "Lector")
-                
-                biografia = None
-                nivel = None
-                if rol == "Periodista":
-                    biografia = input("Biografía: ")
-                elif rol == "Editor":
-                    nivel = input("Nivel (Ej: Senior/Junior): ")
-
-                exito, msg = registrar_usuario(nombre, email, password, rol, biografia, nivel)
-                print(f"\n{msg}")
-            elif opcion == "3":
-                noticias = listar_noticias_publicadas()
-                print("\n--- NOTICIAS PUBLICADAS ---")
-                if not noticias:
-                    print("No hay noticias publicadas aún.")
-                for n in noticias:
-                    print(f"\n[ID: {n.id_noticia}] {n.titulo}")
-                    print(f"{n.contenido}")
-            elif opcion == "0":
-                print("\n¡Hasta luego!")
+        match opcion:
+            case '1':
+                usuario, rol = iniciar_sesion_usuario()
+                if usuario:
+                    cargar_menu_sesion(usuario, rol)
+            case '2':
+                registrar_nuevo_usuario()
+            case '3':
+                mostrar_noticias_publicadas()
+            case '0':
+                print('Saliendo...')
                 break
-        else:
-            if opcion == "1":
-                noticias = listar_noticias_publicadas()
-                print("\n--- NOTICIAS PUBLICADAS ---")
-                if not noticias:
-                    print("No hay noticias publicadas aún.")
-                for n in noticias:
-                    print(f"\n[ID: {n.id_noticia}] {n.titulo}")
-                    print(f"{n.contenido}")
-            elif opcion == "2" and rol_actual in ["Periodista", "Editor"]:
-                titulo = input("Título de la noticia: ")
-                contenido = input("Contenido: ")
-                
-                # Pasamos el objeto usuario_actual completo al servicio
-                exito, msg = crear_noticia(titulo, contenido, usuario_actual)
-                print(f"\n{msg}")
-            elif opcion == "0":
-                usuario_actual = None
-                rol_actual = None
-                print("\nSesión cerrada con éxito.")
+            case _:
+                print(mensaje_error_opcion)

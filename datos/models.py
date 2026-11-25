@@ -106,8 +106,9 @@ class Periodista(BaseModel):
 class Usuario(BaseModel):
     contrasena = CharField()
     email = CharField(max_length=100, unique=True)
+    habilitado = IntegerField(constraints=[SQL("DEFAULT 1")])
     nombre = CharField(max_length=100)
 
     class Meta:
-        table_name = 'usuario'
+        table_name = 'usuario'      
 
