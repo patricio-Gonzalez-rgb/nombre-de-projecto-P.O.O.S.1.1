@@ -50,7 +50,7 @@ db=noticias
 host=localhost
 port=3306
 user=noticias_app
-password=<tu_clave_mysql>
+password=<hola_profe>
 ```
 
 ## Ejecución
@@ -72,3 +72,6 @@ Usuarios de demostración (script de inserts):
 - Cada función o clase va en el módulo de su responsabilidad.
 - Sin consultas a la base de datos en la capa de presentación.
 - Sin contraseñas ni credenciales en el código.
+
+
+nombre: Patricio Andres Gonzalez paillalef
